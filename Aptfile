@@ -1,2 +1,2 @@
 wkhtmltopdf
-pcre2
+libpcre2-16-0
