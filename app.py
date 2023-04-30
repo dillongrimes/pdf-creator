@@ -1,4 +1,6 @@
 import os
+
+import boto3
 import redis
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from urllib.parse import urlparse
@@ -6,6 +8,11 @@ from urllib.parse import urlparse
 app = Flask(__name__)
 dl_filename = '/tmp/ClassGroupAudit.zip'
 pdf_path = '/tmp/ClassGroupAudit'
+
+s3 = boto3.client(
+    's3',
+    aws_access_key_id=os.environ['aws_access_key_id'],
+    aws_secret_access_key=os.environ['aws_secret_access_key'])
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 queue = redis.from_url(redis_url, decode_responses=True)
@@ -45,7 +52,7 @@ def home():
 
 # The route that downloads the zipped up PDFs
 @app.route('/download')
-def downloadFile ():
+def download():
     return send_file(dl_filename, as_attachment=True)
 
 

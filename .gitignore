@@ -2,3 +2,4 @@
 Databases.db
 *.pdf
 *.zip
+.env
