@@ -72,7 +72,7 @@ def create_pdf(url_list):
         if not uri_validator(url):
             bad_urls.append(url)
         else:
-            # add to redis queue
+            # add to redis queue here
             filename = get_name(url)
             pdfkit.from_url(
                 url,
