@@ -4,8 +4,8 @@ from flask import Flask, render_template, request, send_file, redirect, url_for
 from urllib.parse import urlparse
 
 app = Flask(__name__)
-dl_filename = 'ClassGroupAudit.zip'
-pdf_path = 'ClassGroupAudit'
+dl_filename = '/tmp/ClassGroupAudit.zip'
+pdf_path = '/tmp/ClassGroupAudit'
 
 redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 queue = redis.from_url(redis_url, decode_responses=True)
@@ -46,8 +46,7 @@ def home():
 # The route that downloads the zipped up PDFs
 @app.route('/download')
 def downloadFile ():
-    path = f"{dl_filename}"
-    return send_file(path, as_attachment=True)
+    return send_file(dl_filename, as_attachment=True)
 
 
 def uri_validator(x):
