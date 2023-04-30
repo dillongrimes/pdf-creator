@@ -1,39 +1,48 @@
 import os
-import shutil
-from pathlib import Path
-import pdfkit as pdfkit
-from flask import Flask, render_template, request, send_file
+import redis
+from flask import Flask, render_template, request, send_file, redirect, url_for
 from urllib.parse import urlparse
-
-from redis import Redis
 
 app = Flask(__name__)
 dl_filename = 'ClassGroupAudit.zip'
 pdf_path = 'ClassGroupAudit'
 
+redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+queue = redis.from_url(redis_url, decode_responses=True)
+
+pdf_worker_key = 'url_list'
+bad_url_key = 'bad_urls'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    url_list = None
-    bad_urls = []
     if request.method == 'POST':
         urls = request.values.get('urls')
         url_list = urls.split()
-        bad_urls = create_pdf(url_list)
+        queue_pdf_creation(url_list)
+        os.remove(dl_filename)  # remove the existing zip file
+        return redirect(url_for('home'), code=302)
 
     # if the intended zip file exists at the root, allow the user to download
     download_link = None
     if os.path.isfile(dl_filename):
         download_link = '/download'  # matches the route in the application
 
+    # if there are bad urls report on them once
+    bad_urls = []
+    if queue.llen(bad_url_key) > 0:
+        for i in range(queue.llen(bad_url_key)):
+            bad_urls.append(queue.lpop(bad_url_key))
+
     return render_template(
         'home.html',
-        urls=url_list,
+        url_count=queue.llen(pdf_worker_key),
         bad_urls=bad_urls,
         download_link=download_link
     )
 
 
+# The route that downloads the zipped up PDFs
 @app.route('/download')
 def downloadFile ():
     path = f"{dl_filename}"
@@ -48,41 +57,19 @@ def uri_validator(x):
         return False
 
 
-def get_name(url):
-    parsed = urlparse(url)
-    path = parsed.path[1:]
-    second_slash = path.find('/')
-    if second_slash > 0:
-        path = path[:second_slash]
-    return f'{path}.pdf'
-
-
-def create_pdf(url_list):
-    bad_urls = []
-
-    # Create the necessary pdf_path
-    Path(pdf_path).mkdir(parents=True, exist_ok=True)
+def queue_pdf_creation(url_list):
 
     for url in url_list:
         # ensure https:// is at front of urls
         if url[0:3] == 'www':
             url = f'https://{url}'
 
-        # Verify the url is valid (otherwise give output)
+        # Verify the url is valid (otherwise notify)
         if not uri_validator(url):
-            bad_urls.append(url)
+            queue.lpush(bad_url_key, url)
         else:
             # add to redis queue here
-            filename = get_name(url)
-            pdfkit.from_url(
-                url,
-                output_path=os.path.join(pdf_path, filename)
-            )
-        return bad_urls
-
-    # pdfs are done. Zip them up and put them in a predictable location
-    if len(os.listdir(pdf_path)) > 0:
-        shutil.make_archive(dl_filename.replace('.zip', ''), format='zip', root_dir=pdf_path)
+            queue.lpush(pdf_worker_key, url)
 
 
 if __name__ == '__main__':

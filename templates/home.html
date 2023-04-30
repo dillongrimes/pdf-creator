@@ -25,16 +25,19 @@
             </div>
     </form>
 
-    {% if urls %}
+    {% if url_count %}
         <div>
-            PDFs to build: {{ urls|length }}.<br/>
+            PDFs remaining to build: {{ url_count }}.<br/>
             Please refresh this page and a link should appear when these are done.
         </div>
     {% endif %}
 
     {% if bad_urls %}
         <div>
-            These urls are incorrect: {{ bad_urls }}.
+            Some of the urls you put in are incorrect:<br/>
+            {% for bad_url in bad_urls %}
+                {{ bad_url }}<br/>
+            {% endfor %}
         </div>
     {% endif %}
 
