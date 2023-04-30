@@ -20,7 +20,8 @@ def home():
         urls = request.values.get('urls')
         url_list = urls.split()
         queue_pdf_creation(url_list)
-        os.remove(dl_filename)  # remove the existing zip file
+        if os.path.isfile(dl_filename):
+            os.remove(dl_filename)  # remove the existing zip file
         return redirect(url_for('home'), code=302)
 
     # if the intended zip file exists at the root, allow the user to download
