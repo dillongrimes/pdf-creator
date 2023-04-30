@@ -32,6 +32,12 @@
         </div>
     {% endif %}
 
+    {% if bad_urls %}
+        <div>
+            These urls are incorrect: {{ bad_urls }}.
+        </div>
+    {% endif %}
+
     {% if download_link %}
         <div><a href="{{ download_link }}">Download ClassGroup.zip</a></div>
     {% endif %}
