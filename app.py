@@ -1,15 +1,13 @@
-import calendar
 import os
 import shutil
-from datetime import date
 from pathlib import Path
-
 import pdfkit as pdfkit
 from flask import Flask, render_template, request, send_file
 from urllib.parse import urlparse
 
-app = Flask(__name__)
+from redis import Redis
 
+app = Flask(__name__)
 dl_filename = 'ClassGroupAudit.zip'
 pdf_path = 'ClassGroupAudit'
 
