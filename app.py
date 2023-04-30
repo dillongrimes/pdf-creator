@@ -79,7 +79,8 @@ def create_pdf(url_list):
             )
 
     # pdfs are done. Zip them up and put them in a predictable location
-    shutil.make_archive(dl_filename.replace('.zip', ''), format='zip', root_dir=pdf_path)
+    if len(os.listdir(pdf_path)) > 0:
+        shutil.make_archive(dl_filename.replace('.zip', ''), format='zip', root_dir=pdf_path)
 
 
 if __name__ == '__main__':
