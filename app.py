@@ -17,10 +17,11 @@ pdf_path = 'ClassGroupAudit'
 @app.route('/', methods=['GET', 'POST'])
 def home():
     url_list = None
+    bad_urls = []
     if request.method == 'POST':
         urls = request.values.get('urls')
         url_list = urls.split()
-        create_pdf(url_list)
+        bad_urls = create_pdf(url_list)
 
     # if the intended zip file exists at the root, allow the user to download
     download_link = None
@@ -30,6 +31,7 @@ def home():
     return render_template(
         'home.html',
         urls=url_list,
+        bad_urls=bad_urls,
         download_link=download_link
     )
 
@@ -58,26 +60,26 @@ def get_name(url):
 
 
 def create_pdf(url_list):
-    lineno = 0
+    bad_urls = []
 
     # Create the necessary pdf_path
     Path(pdf_path).mkdir(parents=True, exist_ok=True)
 
     for url in url_list:
-        lineno += 1
         # ensure https:// is at front of urls
         if url[0:3] == 'www':
             url = f'https://{url}'
 
         # Verify the url is valid (otherwise give output)
         if not uri_validator(url):
-            print(f'Invalid url on line {lineno}: {url}')
+            bad_urls.append(url)
         else:
             filename = get_name(url)
             pdfkit.from_url(
                 url,
                 output_path=os.path.join(pdf_path, filename)
             )
+        return bad_urls
 
     # pdfs are done. Zip them up and put them in a predictable location
     if len(os.listdir(pdf_path)) > 0:
