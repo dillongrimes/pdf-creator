@@ -97,6 +97,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "python-pdf"
+version = "0.39"
+description = "PDF generation in python using wkhtmltopdf suitable for heroku"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "redis"
 version = "4.5.4"
 description = "Python client for Redis database and key-value store"
@@ -137,7 +145,7 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.11.3"
-content-hash = "dde51854723334cc6c8be5e6abdf98f3dd057ada183047e0c71e2133e2e25254"
+content-hash = "abec393dc364c9209163f64200f86500f3a49c7b68d1794a81f0dabc5e9ff76d"
 
 [metadata.files]
 blinker = []
@@ -149,6 +157,7 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 pdfkit = []
+python-pdf = []
 redis = []
 rq = []
 werkzeug = []

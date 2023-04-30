@@ -11,6 +11,7 @@ pdfkit = "^1.0.0"
 gunicorn = "^20.1.0"
 redis = "^4.5.4"
 rq = "^1.13.0"
+python-pdf = "^0.39"
 
 [tool.poetry.dev-dependencies]
 
