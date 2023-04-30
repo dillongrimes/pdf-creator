@@ -60,6 +60,7 @@ def get_name(url):
 def create_pdf(url_list):
     lineno = 0
 
+    # Create the necessary pdf_path
     Path(pdf_path).mkdir(parents=True, exist_ok=True)
 
     for url in url_list:
