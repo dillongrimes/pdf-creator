@@ -97,14 +97,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "python-pdf"
-version = "0.39"
-description = "PDF generation in python using wkhtmltopdf suitable for heroku"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "redis"
 version = "4.5.4"
 description = "Python client for Redis database and key-value store"
@@ -115,18 +107,6 @@ python-versions = ">=3.7"
 [package.extras]
 hiredis = ["hiredis (>=1.0.0)"]
 ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
-
-[[package]]
-name = "rq"
-version = "1.13.0"
-description = "RQ is a simple, lightweight, library for creating background jobs, and processing them."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-click = ">=5.0.0"
-redis = ">=3.5.0"
 
 [[package]]
 name = "werkzeug"
@@ -145,7 +125,7 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.11.3"
-content-hash = "abec393dc364c9209163f64200f86500f3a49c7b68d1794a81f0dabc5e9ff76d"
+content-hash = "1a0adefbf5832f557549597d6c81dc5b17a55bd0e2b2d4c296603df079419501"
 
 [metadata.files]
 blinker = []
@@ -157,7 +137,5 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 pdfkit = []
-python-pdf = []
 redis = []
-rq = []
 werkzeug = []
