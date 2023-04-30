@@ -28,6 +28,9 @@ def create_pdfs_from_queue():
         except:
             queue.rpush(pdf_worker_key, url)  # put this back in the list if there is an issue
 
+        print(os.path.join(pdf_path, filename))
+        print(os.path.isfile(os.path.join(pdf_path, filename)))
+
     # pdfs are done. Zip them up and put them in a predictable location
     if len(os.listdir(pdf_path)) > 0 and queue.llen(pdf_worker_key) == 0:
         shutil.make_archive(dl_filename.replace('.zip', ''), format='zip', root_dir=pdf_path)
@@ -43,4 +46,5 @@ def get_name(url):
 
 
 if __name__ == '__main__':
-    create_pdfs_from_queue()
+    if queue.llen(pdf_worker_key) > 0:
+        create_pdfs_from_queue()
