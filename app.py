@@ -1,12 +1,8 @@
 import os
-import urllib
-
 import boto3
 import redis
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 from urllib.parse import urlparse
-
-from utils import etag_compare
 
 app = Flask(__name__)
 tmp_path = '/tmp'
