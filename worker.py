@@ -11,9 +11,6 @@ from app import queue, pdf_worker_key, pdf_path, dl_filename, s3
 
 
 def create_pdfs_from_queue():
-    # Create the necessary pdf_path
-    Path(pdf_path).mkdir(parents=True, exist_ok=True)
-
     # CSS to clean up our junky pages
     css = CSS(string='''
         @page {size: 315mm 445.5mm; margin: .5in .1in;}
@@ -33,6 +30,7 @@ def create_pdfs_from_queue():
             queue.rpush(pdf_worker_key, url)  # put this back in the list if there is an issue
 
     # pdfs are done. Zip them up and put the zip file on S3
+    Path(pdf_path).mkdir(parents=True, exist_ok=True)
     if len(os.listdir(pdf_path)) > 0 and queue.llen(pdf_worker_key) == 0:
         zip_bucket()
 
@@ -69,4 +67,3 @@ def get_name(url):
 if __name__ == '__main__':
     if queue.llen(pdf_worker_key) > 0:
         create_pdfs_from_queue()
-    zip_bucket()
