@@ -2,12 +2,14 @@ import os
 import shutil
 from pathlib import Path
 from urllib.parse import urlparse
+
+import botocore.exceptions
 from dotenv import load_dotenv
 from weasyprint import HTML, CSS
 
 load_dotenv()
 
-from app import queue, pdf_worker_key, pdf_path, dl_filename, s3
+from app import queue, pdf_worker_key, pdf_path, dl_filename, s3, s3_bucket
 
 
 def create_pdfs_from_queue():
@@ -28,11 +30,6 @@ def create_pdfs_from_queue():
             s3.put_object(Body=pdf_bytes, Bucket='uline-pdfs', Key=filename, ContentType='application/pdf')
         except:
             queue.rpush(pdf_worker_key, url)  # put this back in the list if there is an issue
-
-    # pdfs are done. Zip them up and put the zip file on S3
-    Path(pdf_path).mkdir(parents=True, exist_ok=True)
-    if len(os.listdir(pdf_path)) > 0 and queue.llen(pdf_worker_key) == 0:
-        zip_bucket()
 
 
 def zip_bucket(bucket_name='uline-pdfs'):
@@ -67,3 +64,14 @@ def get_name(url):
 if __name__ == '__main__':
     if queue.llen(pdf_worker_key) > 0:
         create_pdfs_from_queue()
+    else:
+        # There is nothing in the queue. Update the zip file if one doesn't exist
+        try:
+            response = s3.head_object(
+                Bucket=s3_bucket,
+                Key=dl_filename
+            )
+        except botocore.exceptions.ClientError:
+            Path(pdf_path).mkdir(parents=True, exist_ok=True)
+            zip_bucket()
+

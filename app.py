@@ -1,5 +1,6 @@
 import os
 import boto3
+import botocore.exceptions
 import pytz as pytz
 import redis
 from flask import Flask, render_template, request, redirect, url_for
@@ -35,11 +36,11 @@ def home():
 
     download_link = None
     last_modified = None
-    response = s3.head_object(
-        Bucket=s3_bucket,
-        Key=dl_filename
-    )
-    if response:
+    try:
+        response = s3.head_object(
+            Bucket=s3_bucket,
+            Key=dl_filename
+        )
         last_modified = response['LastModified']
         tz = pytz.timezone('America/Chicago')
         last_modified = last_modified.astimezone(tz)
@@ -47,6 +48,8 @@ def home():
         download_link = s3.generate_presigned_url(
             'get_object', Params={'Bucket': s3_bucket, 'Key': dl_filename}
         )
+    except botocore.exceptions.ClientError:
+        pass
 
     # if there are bad urls report on them once
     bad_urls = []
@@ -84,6 +87,13 @@ def queue_pdf_creation(url_list):
         else:
             # add to redis queue here
             queue.lpush(pdf_worker_key, url)
+
+    if queue.llen(pdf_worker_key) > 0:
+        # clear the old zip file if new urls were added
+        try:
+            s3.Object(s3_bucket, dl_filename).delete()
+        except botocore.exceptions.ClientError:
+            pass
 
 
 if __name__ == '__main__':
