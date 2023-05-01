@@ -33,7 +33,7 @@
     {% endif %}
 
     {% if bad_urls %}
-        <div>
+        <div style="margin-top:30px;">
             Some of the urls you put in are incorrect:<br/>
             {% for bad_url in bad_urls %}
                 {{ bad_url }}<br/>
@@ -42,7 +42,10 @@
     {% endif %}
 
     {% if download_link %}
-        <div><a href="{{ download_link }}">Download ClassGroup.zip</a> (Last modified: {{ last_modified }})</div>
+        <div style="margin-top:30px;">
+            <a href="{{ download_link }}">Download ClassGroupAudit.zip</a><br/>
+            (Last modified: {{ last_modified }})
+        </div>
     {% endif %}
 
 </body>

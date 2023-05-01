@@ -1,5 +1,6 @@
 import os
 import boto3
+import pytz as pytz
 import redis
 from flask import Flask, render_template, request, redirect, url_for
 from urllib.parse import urlparse
@@ -40,7 +41,9 @@ def home():
     )
     if response:
         last_modified = response['LastModified']
-        last_modified = last_modified.strftime('%Y-%m-%d %H:%M')
+        tz = pytz.timezone('America/Chicago')
+        last_modified = last_modified.astimezone(tz)
+        last_modified = last_modified.strftime('%Y-%m-%d %l:%M%p')
         download_link = s3.generate_presigned_url(
             'get_object', Params={'Bucket': s3_bucket, 'Key': dl_filename}
         )

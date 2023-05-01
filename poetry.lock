@@ -311,6 +311,14 @@ python-versions = ">=3.8"
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pytz"
+version = "2023.3"
+description = "World timezone definitions, modern and historical"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "redis"
 version = "4.5.4"
 description = "Python client for Redis database and key-value store"
@@ -445,7 +453,7 @@ test = ["pytest"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "87857ca08b82117091ceeb439aa703916d76e063ce53757ce7cba40ed787cd68"
+content-hash = "6d3bc8f5481b95381ccd73ffc014bce1035c7a2f44c86234eead8faf49b5871c"
 
 [metadata.files]
 async-timeout = []
@@ -473,6 +481,7 @@ pydyf = []
 pyphen = []
 python-dateutil = []
 python-dotenv = []
+pytz = []
 redis = []
 s3transfer = []
 six = []

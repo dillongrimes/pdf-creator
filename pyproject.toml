@@ -12,6 +12,7 @@ redis = "^4.5.4"
 weasyprint = "^58.1"
 boto3 = "^1.26.123"
 python-dotenv = "^1.0.0"
+pytz = "^2023.3"
 
 [tool.poetry.dev-dependencies]
 
