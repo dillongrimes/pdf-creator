@@ -1,14 +1,21 @@
 import os
+import urllib
 
 import boto3
 import redis
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from urllib.parse import urlparse
 
-app = Flask(__name__)
-dl_filename = '/tmp/ClassGroupAudit.zip'
-pdf_path = '/tmp/ClassGroupAudit'
+from utils import etag_compare
 
+app = Flask(__name__)
+tmp_path = '/tmp'
+dl_filename = 'ClassGroupAudit.zip'
+dl_filepath = os.path.join(tmp_path, dl_filename)
+pdf_folder_name = 'ClassGroupAudit'
+pdf_path = os.path.join(tmp_path, pdf_folder_name)
+
+s3_bucket = 'uline-pdfs'
 s3 = boto3.client(
     's3',
     aws_access_key_id=os.environ['aws_access_key_id'],
@@ -27,14 +34,20 @@ def home():
         urls = request.values.get('urls')
         url_list = urls.split()
         queue_pdf_creation(url_list)
-        if os.path.isfile(dl_filename):
-            os.remove(dl_filename)  # remove the existing zip file
         return redirect(url_for('home'), code=302)
 
-    # if the intended zip file exists at the root, allow the user to download
     download_link = None
-    if os.path.isfile(dl_filename):
-        download_link = '/download'  # matches the route in the application
+    last_modified = None
+    response = s3.head_object(
+        Bucket=s3_bucket,
+        Key=dl_filename
+    )
+    if response:
+        last_modified = response['LastModified']
+        last_modified = last_modified.strftime('%Y-%m-%d %H:%M')
+        download_link = s3.generate_presigned_url(
+            'get_object', Params={'Bucket': s3_bucket, 'Key': dl_filename}
+        )
 
     # if there are bad urls report on them once
     bad_urls = []
@@ -46,14 +59,9 @@ def home():
         'home.html',
         url_count=queue.llen(pdf_worker_key),
         bad_urls=bad_urls,
-        download_link=download_link
+        download_link=download_link,
+        last_modified=last_modified
     )
-
-
-# The route that downloads the zipped up PDFs
-@app.route('/download')
-def download():
-    return send_file(dl_filename, as_attachment=True)
 
 
 def uri_validator(x):

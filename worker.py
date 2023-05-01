@@ -32,7 +32,7 @@ def create_pdfs_from_queue():
         except:
             queue.rpush(pdf_worker_key, url)  # put this back in the list if there is an issue
 
-    # pdfs are done. Zip them up and put them in a predictable location
+    # pdfs are done. Zip them up and put the zip file on S3
     if len(os.listdir(pdf_path)) > 0 and queue.llen(pdf_worker_key) == 0:
         zip_bucket()
 
@@ -54,6 +54,7 @@ def zip_bucket(bucket_name='uline-pdfs'):
 
     # now create empty zip file in /tmp directory use suffix .zip if you want
     shutil.make_archive(dl_filename.replace('.zip', ''), format='zip', root_dir=pdf_path)
+    s3.upload_file(dl_filename, Bucket=bucket_name, Key='ClassGroupAudit.zip')
 
 
 def get_name(url):
@@ -68,3 +69,4 @@ def get_name(url):
 if __name__ == '__main__':
     if queue.llen(pdf_worker_key) > 0:
         create_pdfs_from_queue()
+    zip_bucket()
