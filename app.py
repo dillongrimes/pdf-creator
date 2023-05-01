@@ -91,7 +91,7 @@ def queue_pdf_creation(url_list):
     if queue.llen(pdf_worker_key) > 0:
         # clear the old zip file if new urls were added
         try:
-            s3.Object(s3_bucket, dl_filename).delete()
+            s3.delete_object(Bucket=s3_bucket, Key=dl_filename)
         except botocore.exceptions.ClientError:
             pass
 
