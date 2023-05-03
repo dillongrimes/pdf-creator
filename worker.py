@@ -13,19 +13,23 @@ from app import queue, pdf_worker_key, pdf_path, dl_filename, s3, s3_bucket
 
 
 def create_pdfs_from_queue():
-    # CSS to clean up our junky pages
-    css = CSS(string='''
-        @page {size: 315mm 445.5mm; margin: .5in .1in;}
-        .noscript{display: none !important;}
-        .skip-link{display: none !important;}
-        .headerStatusLine{visibility: hidden;}
-        .foldout a.cssa img{display: none !important;}
-    ''')
-
     for i in range(0, queue.llen(pdf_worker_key)):
+        filename = get_name(url)
+        # Custom CSS to clean up mistakes in HTML and add the filename to the header
+        css = CSS(string='''
+            @page {
+                size: 315mm 445.5mm; margin: .5in .1in;
+                @top-right {
+                    content: '''+filename+'''
+                }
+            }
+            .noscript{display: none !important;}
+            .skip-link{display: none !important;}
+            .headerStatusLine{visibility: hidden;}
+            .foldout a.cssa img{display: none !important;}
+        ''')
         url = queue.lpop(pdf_worker_key)
         try:
-            filename = get_name(url)
             pdf_bytes = HTML(url).write_pdf(stylesheets=[css])
             s3.put_object(Body=pdf_bytes, Bucket='uline-pdfs', Key=filename, ContentType='application/pdf')
         except:
