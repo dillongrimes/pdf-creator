@@ -21,8 +21,9 @@ def create_pdfs_from_queue():
             css = CSS(string='''
                 @page {
                     size: 315mm 445.5mm; margin: .5in .1in;
-                    @top-right {
-                        content: "'''+filename+'''"
+                    @top-left {
+                        content: "'''+filename.replace('.pdf','')+'''";
+                        font-size: 2em;
                     }
                 }
                 .noscript{display: none !important;}
