@@ -20,7 +20,7 @@ def create_pdfs_from_queue():
             @page {
                 size: 315mm 445.5mm; margin: .5in .1in;
                 @top-right {
-                    content: '''+filename+'''
+                    content: "'''+filename+'''"
                 }
             }
             .noscript{display: none !important;}
