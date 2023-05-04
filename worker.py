@@ -31,6 +31,7 @@ def create_pdfs_from_queue():
                 .headerStatusLine{visibility: hidden;}
                 .foldout a.cssa img{display: none !important;}
                 br{clear:both;display:block;}
+                a.cssa br{display:inline;}
             ''')
         
             pdf_bytes = HTML(url).write_pdf(stylesheets=[css])
